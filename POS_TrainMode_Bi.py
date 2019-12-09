@@ -38,14 +38,14 @@ def batches(data, batch_size):
 class LSTM_Tagger(nn.Module):
     def __init__(self, emb, tag2ind_size, emb_dim = 100, lstm_hid_dim = 128):
         super(LSTM_Tagger, self).__init__()
-        self.emb = nn.Embedding.from_pretrained(emb)
-        self.emb2hid = nn.LSTM(emb_dim, lstm_hid_dim, bidirectional = True)
-        self.hid2tag = nn.Linear(lstm_hid_dim * 2, tag2ind_size)
+        self.word_embeddings = nn.Embedding.from_pretrained(emb)
+        self.emb2hidden = nn.LSTM(emb_dim, lstm_hid_dim, bidirectional = True)
+        self.hidden2tag = nn.Linear(lstm_hid_dim * 2, tag2ind_size)
         
     def forward(self, seq, batch_size):
-        emb = self.emb(seq)
-        lstm_out, _ = self.emb2hid(emb.view(len(seq), batch_size, -1))
-        tags = func.softmax(self.hid2tag(lstm_out), dim = 2)
+        emb = self.word_embeddings(seq)
+        lstm_out, _ = self.emb2hidden(emb.view(len(seq), batch_size, -1))
+        tags = func.softmax(self.hidden2tag(lstm_out), dim = 2)
         return tags
 
 os.chdir("C:\CourseWork\Term5")
@@ -55,6 +55,7 @@ X_train, y_train = json.load(open("train_data.txt", "r"))
 word2ind = json.load(open("word2ind.txt", "r"))
 tag2ind = json.load(open("tag2ind.txt", "r"))
 emb = json.load(open("embeddings.txt", "r"))
+emb = FloatTensor(emb)
 
 model = LSTM_Tagger(emb, len(tag2ind))
 
