@@ -34,37 +34,43 @@ def batches(data, batch_size):
             
         yield X_batch, y_batch
 
+
 class LSTM_Tagger(nn.Module):
-    def __init__(self, word2ind_size, tag2ind_size, emb_dim = 100, lstm_hid_dim = 128):
+    def __init__(self, word2ind_size, tag2ind_size, emb_dim = 100, hidden_dim = 128):
         super(LSTM_Tagger, self).__init__()
-        self.emb = nn.Embedding(word2ind_size, emb_dim)
-        self.emb2hid = nn.LSTM(emb_dim, lstm_hid_dim)
-        self.hid2tag = nn.Linear(lstm_hid_dim, tag2ind_size)
+        self.word_embeddings = nn.Embedding(word2ind_size, emb_dim)
+        self.emb2hidden = nn.LSTM(emb_dim, hidden_dim)
+        self.hidden2tag = nn.Linear(hidden_dim, tag2ind_size)
         
     def forward(self, seq, batch_size):
-        emb = self.emb(seq)
-        lstm_out, _ = self.emb2hid(emb.view(len(seq), batch_size, -1))
-        tags = func.softmax(self.hid2tag(lstm_out), dim = 2)
+        emb = self.word_embeddings(seq)
+        lstm_out, _ = self.emb2hidden(emb.view(len(seq), batch_size, -1))
+        tags = func.softmax(self.hidden2tag(lstm_out), dim = 2)
         return tags
 
 os.chdir("C:\CourseWork\Term5")
     
-#X_val, y_val = json.load(open("val_data.txt", "r"))
-X_test, y_test = json.load(open("test_data.txt", "r"))
+X_val, y_val = json.load(open("val_data.txt", "r"))
+#X_test, y_test = json.load(open("test_data.txt", "r"))
 
-model = torch.load("POS_3.pt")
+word2ind = json.load(open("word2ind.txt"))
+tag2ind = json.load(open("tag2ind.txt"))
+
+model = LSTM_Tagger(len(word2ind), len(tag2ind))
+filename = "POS_2"
+model.load_state_dict(torch.load(filename + ".pt"))
 model.eval()
 
 batch_size = 64
-#n_batches = math.ceil(len(X_val) / batch_size)
-n_batches = math.ceil(len(X_test) / batch_size)
+n_batches = math.ceil(len(X_val) / batch_size)
+#n_batches = math.ceil(len(X_test) / batch_size)
 
-#out_file = open("val_accuracy_3.txt", "w+")
-out_file = open("test_accuracy_3.txt", "w+")
+out_file = open("val_" + filename + ".txt", "w+")
+#out_file = open("test_" + filename + ".txt", "w+")
 
 with tqdm(total = n_batches) as progress_bar:
-    #for i, (X_batch, y_batch) in enumerate(batches((X_val, y_val), batch_size)):
-    for i, (X_batch, y_batch) in enumerate(batches((X_test, y_test), batch_size)):
+    for i, (X_batch, y_batch) in enumerate(batches((X_val, y_val), batch_size)):
+    #for i, (X_batch, y_batch) in enumerate(batches((X_test, y_test), batch_size)):
  
         X_batch, y_batch = LongTensor(X_batch), LongTensor(y_batch)
         tags = model(X_batch, len(X_batch[0]))
@@ -91,7 +97,7 @@ with tqdm(total = n_batches) as progress_bar:
         accuracy = float(current_correct) / current
         
         #OUTPUT
-        out_file.write(str(accuracy))
+        out_file.write(str(accuracy) + "\n")
         
         progress_bar.update()
         progress_bar.set_description('Accuracy = ' + str(accuracy))
