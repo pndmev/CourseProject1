@@ -37,4 +37,5 @@ Not-NN solution of POS problem:
 - Ngram_Tagger.py
 
 Just run TestMode files to test preatrained models (don't forget to change path of current directory in os.chdir() method).
+
 File Statistics.xlsx contains statistics data used in article
