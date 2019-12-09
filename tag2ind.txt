@@ -1,0 +1,1 @@
+{"ADV": 1, "X": 2, "NOUN": 3, "ADJ": 4, "CONJ": 5, "DET": 6, "ADP": 7, ".": 8, "VERB": 9, "PRON": 10, "PRT": 11, "NUM": 12, "<pad>": 0}
