@@ -9,6 +9,7 @@ Bidirectional RNN model:
 1) Large bididrectional RNN model (hidden dimension = 128):
   - source code: POS_TrainMode_Bi.py (code for training model), POS_TestMode_Bi.py (code for testing model)
   - pretrained models: POS_BiN.pt (N in [1, 3]) - preatrained model after (N + 1) epochs
+  - for fun: POS_Bi_Fun.py (you can write your own sentence and get an aswer (write ALL words (including sings) separately, example: What do you do ?))
 2) Small bidirectional RNN model (hidden dimension = 64):
   - source code: just change the hidden dimension value on 64 in POS_TrainMode_Bi.py and POS_TestMode_Bi.py
   - pretrained models: POS_Bi_N.pt (N in [0, 8]) - prettrained model after (N + 1) epochs
